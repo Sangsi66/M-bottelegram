@@ -1,0 +1,36 @@
+import requests
+from telegram.ext import Updater, CommandHandler
+
+# Replace 'YOUR_TELEGRAM_BOT_TOKEN' with your Telegram bot token
+TOKEN = '6943343110:AAGVqabdBKRgdZIAaRxOCzcoToPgd65E8Ck'
+
+# Replace 'YOUR_COINMARKETCAP_API_KEY' with your CoinMarketCap API key
+API_KEY = 'ff79c8a4-4705-47d9-9f0b-25fc930b11fb'
+
+def start(update, context):
+    update.message.reply_text("Xin chào! Tôi là bot báo giá Bitcoin. Sử dụng lệnh /price để nhận thông tin về giá Bitcoin.")
+
+def price(update, context):
+    url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest'
+    parameters = {
+        'symbol': 'BTC'
+    }
+    headers = {
+        'Accepts': 'application/json',
+        'X-CMC_PRO_API_KEY': API_KEY,
+    }
+    response = requests.get(url, params=parameters, headers=headers)
+    data = response.json()
+    btc_price = data['data']['BTC']['quote']['USD']['price']
+    update.message.reply_text(f"Giá Bitcoin hiện tại là ${btc_price}")
+
+def main():
+    updater = Updater(TOKEN, use_context=True)
+    dp = updater.dispatcher
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("price", price))
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
